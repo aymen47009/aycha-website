@@ -1,75 +1,64 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>موقعي - عائشة</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>موقع عائشة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: sans-serif;
       background-color: #fef6f9;
-      color: #444;
       text-align: center;
-      padding: 20px;
-      margin: 0;
+      padding: 2rem;
     }
-
-    img {
-      width: 200px;
-      max-width: 90%;
-      border-radius: 50%;
-      transition: transform 0.3s;
-      cursor: pointer;
-    }
-
-    h1 {
-      color: #d85f9b;
-      font-size: 28px;
-    }
-
     .card {
-      background-color: #fff;
-      border-radius: 20px;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-
-    /* ✅ خاص للهاتف */
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 22px;
-      }
-
-      .card {
-        padding: 15px;
-        margin: 15px;
-      }
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 400px;
+      margin: auto;
     }
   </style>
 </head>
 <body>
-
-  <h1>مرحبًا! أنا عائشة 💖</h1>
-
-  <img src="aycha.jpg" alt="صورة عائشة" onclick="alert('أنا عائشة 😊')">
-
+  <h1>💖 مرحبًا بكم في موقع عائشة</h1>
   <div class="card">
-    <h2>من أنا؟</h2>
-    <p>أنا فتاة أحب الرسم والألوان الفاتحة. أتعلم البرمجة وأحب قراءة القصص.</p>
+    <h2 id="name">تحميل...</h2>
+    <p id="bio">جاري تحميل النبذة...</p>
   </div>
 
-  <div class="card">
-    <h2>هواياتي 🎨</h2>
-    <p>الرسم، القراءة، تصميم المواقع، والألعاب التعليمية.</p>
-  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <div class="card">
-    <h2>كلمتي المفضلة 🌟</h2>
-    <p>"أنا أستطيع، أنا مبدعة، أنا عائشة!"</p>
-  </div>
-  <a href="notes.html" class="button">📔 مذكراتي</a>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+      authDomain: "aycha-website.firebaseapp.com",
+      projectId: "aycha-website",
+      storageBucket: "aycha-website.firebasestorage.app",
+      messagingSenderId: "488063935676",
+      appId: "1:488063935676:web:8a6450edd804d711db5cb9",
+      measurementId: "G-90K4BCQ9RE"
+    };
 
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadData() {
+      const docRef = doc(db, "profile", "aycha");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        document.getElementById("name").innerText = docSnap.data().name;
+        document.getElementById("bio").innerText = docSnap.data().bio;
+      } else {
+        document.getElementById("name").innerText = "لا توجد بيانات بعد.";
+        document.getElementById("bio").innerText = "";
+      }
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
