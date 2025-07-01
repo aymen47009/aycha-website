@@ -53,7 +53,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function save() {
+      window.save = async function () {
       const name = document.getElementById("name").value;
       const bio = document.getElementById("bio").value;
 
