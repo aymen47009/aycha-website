@@ -3,33 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <title>موقعي - عائشة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: 'Arial', sans-serif;
       background-color: #fef6f9;
       color: #444;
       text-align: center;
-      padding: 30px;
+      padding: 20px;
+      margin: 0;
     }
+
     img {
       width: 200px;
+      max-width: 90%;
       border-radius: 50%;
       transition: transform 0.3s;
       cursor: pointer;
     }
-    img:hover {
-      transform: scale(1.2);
-    }
+
     h1 {
       color: #d85f9b;
+      font-size: 28px;
     }
+
     .card {
       background-color: #fff;
       border-radius: 20px;
       padding: 20px;
       margin: 20px auto;
-      max-width: 400px;
+      max-width: 500px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* ✅ خاص للهاتف */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 15px;
+        margin: 15px;
+      }
     }
   </style>
 </head>
