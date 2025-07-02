@@ -4,25 +4,85 @@
   <meta charset="UTF-8">
   <title>لوحة تحكم عائشة</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+    }
+    .preview, .editor {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .preview {
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    .preview img {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #ccc;
+    }
+    .editor {
+      background-color: #fff;
+      border-right: 1px solid #ddd;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+  </style>
 </head>
 <body>
-  <h1>لوحة تحكم عائشة</h1>
+  <!-- المعاينة -->
+  <div class="preview">
+    <h2>ما يراه الزائر:</h2>
+    <img id="previewImage" src="" alt="الصورة">
+    <h1 id="previewName">...</h1>
+    <p id="previewBio">...</p>
+  </div>
 
-  <input type="text" id="name" placeholder="اسمك"><br><br>
-  <textarea id="bio" placeholder="نبذة عنك"></textarea><br><br>
+  <!-- التعديل -->
+  <div class="editor">
+    <h2>التحكم في البيانات:</h2>
 
-  <input type="file" id="image" accept="image/*"><br><br>
+    <label>👤 الاسم:</label>
+    <input type="text" id="nameInput">
+    <button onclick="saveName()">حفظ الاسم</button>
 
-  <button id="saveBtn">💾 حفظ البيانات</button>
-  <p id="status"></p>
+    <label>📝 النبذة:</label>
+    <textarea id="bioInput"></textarea>
+    <button onclick="saveBio()">حفظ النبذة</button>
 
-  <!-- Firebase SDK -->
+    <label>📷 تغيير الصورة:</label>
+    <input type="file" id="imageInput">
+    <button onclick="uploadImage()">رفع الصورة</button>
+  </div>
+
   <script type="module">
-    // استيراد Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
       authDomain: "aycha-website.firebaseapp.com",
@@ -35,52 +95,54 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // دالة حفظ البيانات
-    async function save() {
-      const name = document.getElementById("name").value;
-      const bio = document.getElementById("bio").value;
-      const file = document.getElementById("image").files[0];
+    const docRef = doc(db, "profile", "aycha");
 
-      if (!file) {
-        alert("❗ يرجى اختيار صورة");
-        return;
-      }
+    async function loadData() {
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        document.getElementById("previewName").innerText = data.name;
+        document.getElementById("previewBio").innerText = data.bio;
+        document.getElementById("previewImage").src = data.imageUrl;
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "unsigned_preset"); // اسم الـ preset في Cloudinary
-      formData.append("folder", "profileImages"); // المجلد الذي اخترته في Cloudinary
-
-      document.getElementById("status").innerText = "⏳ جاري رفع الصورة...";
-
-      try {
-        const response = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (!data.secure_url) {
-          throw new Error("❌ فشل في رفع الصورة إلى Cloudinary");
-        }
-
-        // حفظ البيانات في Firestore
-        await setDoc(doc(db, "profile", "aycha"), {
-          name: name,
-          bio: bio,
-          imageUrl: data.secure_url
-        });
-
-        document.getElementById("status").innerText = "✅ تم الحفظ بنجاح!";
-      } catch (error) {
-        console.error(error);
-        document.getElementById("status").innerText = "❌ حدث خطأ أثناء الحفظ";
+        document.getElementById("nameInput").value = data.name;
+        document.getElementById("bioInput").value = data.bio;
       }
     }
 
-    // ربط الزر بالدالة
-    document.getElementById("saveBtn").addEventListener("click", save);
+    window.saveName = async () => {
+      const name = document.getElementById("nameInput").value;
+      await updateDoc(docRef, { name });
+      document.getElementById("previewName").innerText = name;
+    };
+
+    window.saveBio = async () => {
+      const bio = document.getElementById("bioInput").value;
+      await updateDoc(docRef, { bio });
+      document.getElementById("previewBio").innerText = bio;
+    };
+
+    window.uploadImage = async () => {
+      const file = document.getElementById("imageInput").files[0];
+      if (!file) return alert("📷 اختر صورة أولاً");
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "unsigned_preset");
+      formData.append("folder", "profileImages");
+
+      const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      const imageUrl = data.secure_url;
+
+      await updateDoc(docRef, { imageUrl });
+      document.getElementById("previewImage").src = imageUrl;
+    };
+
+    loadData();
   </script>
 </body>
 </html>
