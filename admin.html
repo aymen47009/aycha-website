@@ -5,13 +5,14 @@
   <title>لوحة تحكم عائشة</title>
 </head>
 <body>
-  <h1>📸 رفع صورة إلى مجلد <code>profileImages</code></h1>
+  <h1>📸 رفع صورة إلى مجلد <code>profileImages</code> وتخزين الرابط في Firebase</h1>
 
   <input type="file" id="uploadInput" accept="image/*" />
   <button onclick="uploadImage()">رفع الصورة</button>
 
   <div id="preview" style="margin-top: 20px;"></div>
 
+  <!-- Cloudinary upload -->
   <script>
     async function uploadImage() {
       const fileInput = document.getElementById("uploadInput");
@@ -25,7 +26,7 @@
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "unsigned_preset");
-      formData.append("folder", "profileImages"); // 💡 هذا السطر هو المفتاح!
+      formData.append("folder", "profileImages");
 
       try {
         const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
@@ -39,8 +40,15 @@
           document.getElementById("preview").innerHTML = `
             <p>✅ تم رفع الصورة بنجاح!</p>
             <img src="${data.secure_url}" alt="الصورة" width="200" />
-            <p><strong>رابط الصورة:</strong> <a href="${data.secure_url}" target="_blank">${data.secure_url}</a></p>
+            <p><strong>رابط:</strong> <a href="${data.secure_url}" target="_blank">${data.secure_url}</a></p>
           `;
+
+          // 📝 إرسال الرابط إلى Firebase
+          firebase.database().ref("latestImage").set({
+            name: file.name,
+            url: data.secure_url,
+            uploadedAt: Date.now()
+          });
         } else {
           alert("حدث خطأ أثناء رفع الصورة.");
         }
@@ -49,6 +57,25 @@
         alert("❌ فشل في الاتصال بـ Cloudinary");
       }
     }
+  </script>
+
+  <!-- Firebase SDK (Compat version) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+      authDomain: "aycha-website.firebaseapp.com",
+      databaseURL: "https://aycha-website-default-rtdb.firebaseio.com",
+      projectId: "aycha-website",
+      storageBucket: "aycha-website.appspot.com",
+      messagingSenderId: "488063935676",
+      appId: "1:488063935676:web:8a6450edd804d711db5cb9",
+      measurementId: "G-90K4BCQ9RE"
+    };
+
+    firebase.initializeApp(firebaseConfig);
   </script>
 </body>
 </html>
