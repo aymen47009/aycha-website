@@ -1,82 +1,54 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>لوحة تحكم عائشة</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #fff8f5;
-      text-align: center;
-      padding: 2rem;
-    }
-    input, textarea, button {
-      padding: 10px;
-      margin: 10px;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #ff80b5;
-      color: white;
-      cursor: pointer;
-    }
-  </style>
 </head>
 <body>
-  <h1>🛠️ لوحة تحكم عائشة</h1>
-  <input type="text" id="name" placeholder="اكتبي اسمك" />
-  <br />
-  <textarea id="bio" placeholder="اكتبي نبذة عنك..."></textarea>
-  <br />
-  <input type="file" id="imageInput" accept="image/*" />
-  <br />
-  <button onclick="save()">💾 حفظ</button>
-  <p id="status"></p>
+  <h1>📸 رفع صورة إلى مجلد <code>profileImages</code></h1>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  <input type="file" id="uploadInput" accept="image/*" />
+  <button onclick="uploadImage()">رفع الصورة</button>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
-      authDomain: "aycha-website.firebaseapp.com",
-      projectId: "aycha-website",
-      storageBucket: "aycha-website.appspot.com",
-      messagingSenderId: "488063935676",
-      appId: "1:488063935676:web:8a6450edd804d711db5cb9",
-      measurementId: "G-90K4BCQ9RE"
-    };
+  <div id="preview" style="margin-top: 20px;"></div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+  <script>
+    async function uploadImage() {
+      const fileInput = document.getElementById("uploadInput");
+      const file = fileInput.files[0];
 
-    window.save = async function () {
-      const name = document.getElementById("name").value;
-      const bio = document.getElementById("bio").value;
-      const imageFile = document.getElementById("imageInput").files[0];
-
-      let imageUrl = "";
-
-      if (imageFile) {
-        const imageRef = ref(storage, 'profileImages/aycha.jpg');
-        await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(imageRef);
+      if (!file) {
+        alert("❗ يرجى اختيار صورة أولاً");
+        return;
       }
 
-      await setDoc(doc(db, "profile", "aycha"), {
-        name: name,
-        bio: bio,
-        imageUrl: imageUrl
-      });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "unsigned_preset");
+      formData.append("folder", "profileImages"); // 💡 هذا السطر هو المفتاح!
 
-      document.getElementById("status").innerText = "✅ تم الحفظ بنجاح!";
-    };
+      try {
+        const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.secure_url) {
+          document.getElementById("preview").innerHTML = `
+            <p>✅ تم رفع الصورة بنجاح!</p>
+            <img src="${data.secure_url}" alt="الصورة" width="200" />
+            <p><strong>رابط الصورة:</strong> <a href="${data.secure_url}" target="_blank">${data.secure_url}</a></p>
+          `;
+        } else {
+          alert("حدث خطأ أثناء رفع الصورة.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ فشل في الاتصال بـ Cloudinary");
+      }
+    }
   </script>
 </body>
 </html>
