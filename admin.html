@@ -69,6 +69,11 @@
     h1, h2, p, label {
       margin-bottom: 10px;
     }
+    .section {
+      border-top: 1px solid #eee;
+      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -78,6 +83,9 @@
     <img id="previewImage" src="" alt="الصورة">
     <h1 id="previewName">...</h1>
     <p id="previewBio">...</p>
+    <div id="previewPortfolio"></div>
+    <div id="previewBlog"></div>
+    <div id="previewGallery"></div>
   </div>
 
   <!-- التعديل -->
@@ -95,11 +103,19 @@
     <label>📷 تغيير الصورة:</label>
     <input type="file" id="imageInput">
     <button onclick="uploadImage()">رفع الصورة</button>
+
+    <div class="section">
+      <h3>🎨 أضف عملًا جديدًا:</h3>
+      <input type="text" id="projectTitle" placeholder="عنوان العمل">
+      <input type="text" id="projectDesc" placeholder="وصف مختصر">
+      <input type="file" id="projectImage">
+      <button onclick="addProject()">➕ إضافة للعمل</button>
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
@@ -125,6 +141,14 @@
         document.getElementById("nameInput").value = data.name;
         document.getElementById("bioInput").value = data.bio;
       }
+
+      const portfolioSnap = await getDocs(collection(db, "portfolio"));
+      let html = "<h3>📂 أعمالي:</h3>";
+      portfolioSnap.forEach(doc => {
+        const item = doc.data();
+        html += `<div style="margin-bottom: 1rem"><img src="${item.image}" style="max-width:100%;border:1px solid #ccc;border-radius:8px"><h4>${item.title}</h4><p>${item.description}</p></div>`;
+      });
+      document.getElementById("previewPortfolio").innerHTML = html;
     }
 
     window.saveName = async () => {
@@ -168,6 +192,37 @@
       } catch (error) {
         console.error("❌ خطأ في الاتصال بـ Cloudinary:", error);
         alert("فشل الاتصال بـ Cloudinary");
+      }
+    };
+
+    window.addProject = async () => {
+      const title = document.getElementById("projectTitle").value;
+      const description = document.getElementById("projectDesc").value;
+      const file = document.getElementById("projectImage").files[0];
+      if (!file || !title || !description) return alert("📝 يرجى ملء كل الحقول واختيار صورة");
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "unsigned_preset");
+      formData.append("folder", "projects");
+
+      try {
+        const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.secure_url) {
+          await addDoc(collection(db, "portfolio"), {
+            title,
+            description,
+            image: data.secure_url
+          });
+          alert("✅ تم إضافة العمل");
+          loadData();
+        }
+      } catch (e) {
+        alert("❌ فشل رفع صورة العمل");
       }
     };
 
