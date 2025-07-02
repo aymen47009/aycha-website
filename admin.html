@@ -94,7 +94,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     const docRef = doc(db, "profile", "aycha");
 
     async function loadData() {
@@ -131,15 +130,27 @@
       formData.append("upload_preset", "unsigned_preset");
       formData.append("folder", "profileImages");
 
-      const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
-        method: "POST",
-        body: formData
-      });
-      const data = await res.json();
-      const imageUrl = data.secure_url;
+      try {
+        const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
+          method: "POST",
+          body: formData
+        });
 
-      await updateDoc(docRef, { imageUrl });
-      document.getElementById("previewImage").src = imageUrl;
+        const data = await res.json();
+
+        if (data.secure_url) {
+          const imageUrl = data.secure_url;
+          await updateDoc(docRef, { imageUrl });
+          document.getElementById("previewImage").src = imageUrl;
+          alert("✅ تم رفع الصورة بنجاح");
+        } else {
+          console.error("❌ لم يتم استلام رابط الصورة", data);
+          alert("حدث خطأ أثناء رفع الصورة");
+        }
+      } catch (error) {
+        console.error("❌ خطأ في الاتصال بـ Cloudinary:", error);
+        alert("فشل الاتصال بـ Cloudinary");
+      }
     };
 
     loadData();
