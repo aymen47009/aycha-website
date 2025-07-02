@@ -13,14 +13,16 @@
 
   <input type="file" id="image" accept="image/*"><br><br>
 
-  <button onclick="save()">💾 حفظ البيانات</button>
+  <button id="saveBtn">💾 حفظ البيانات</button>
   <p id="status"></p>
 
   <!-- Firebase SDK -->
   <script type="module">
+    // استيراد Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
       authDomain: "aycha-website.firebaseapp.com",
@@ -33,6 +35,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // دالة حفظ البيانات
     async function save() {
       const name = document.getElementById("name").value;
       const bio = document.getElementById("bio").value;
@@ -43,11 +46,10 @@
         return;
       }
 
-      // رفع الصورة إلى Cloudinary
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "unsigned_preset");
-      formData.append("folder", "profileImages");
+      formData.append("upload_preset", "unsigned_preset"); // اسم الـ preset في Cloudinary
+      formData.append("folder", "profileImages"); // المجلد الذي اخترته في Cloudinary
 
       document.getElementById("status").innerText = "⏳ جاري رفع الصورة...";
 
@@ -76,6 +78,9 @@
         document.getElementById("status").innerText = "❌ حدث خطأ أثناء الحفظ";
       }
     }
+
+    // ربط الزر بالدالة
+    document.getElementById("saveBtn").addEventListener("click", save);
   </script>
 </body>
 </html>
