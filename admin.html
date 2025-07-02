@@ -62,6 +62,7 @@
       cursor: pointer;
       font-size: 16px;
       transition: background 0.3s;
+      margin-bottom: 1rem;
     }
     button:hover {
       background: #ec8ec6;
@@ -69,10 +70,20 @@
     h1, h2, p, label {
       margin-bottom: 10px;
     }
-    .section {
-      border-top: 1px solid #eee;
-      padding-top: 1.5rem;
-      margin-top: 1.5rem;
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      background-color: #fffefc;
+      text-align: right;
+    }
+    .card img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
     }
   </style>
 </head>
@@ -83,9 +94,12 @@
     <img id="previewImage" src="" alt="الصورة">
     <h1 id="previewName">...</h1>
     <p id="previewBio">...</p>
-    <div id="previewPortfolio"></div>
-    <div id="previewBlog"></div>
-    <div id="previewGallery"></div>
+
+    <h2>📁 أعمالي:</h2>
+    <div id="portfolio"></div>
+
+    <h2>✍️ مدونتي:</h2>
+    <div id="blog"></div>
   </div>
 
   <!-- التعديل -->
@@ -104,13 +118,20 @@
     <input type="file" id="imageInput">
     <button onclick="uploadImage()">رفع الصورة</button>
 
-    <div class="section">
-      <h3>🎨 أضف عملًا جديدًا:</h3>
-      <input type="text" id="projectTitle" placeholder="عنوان العمل">
-      <input type="text" id="projectDesc" placeholder="وصف مختصر">
-      <input type="file" id="projectImage">
-      <button onclick="addProject()">➕ إضافة للعمل</button>
-    </div>
+    <hr>
+
+    <h3>➕ إضافة عمل:</h3>
+    <input type="text" id="workTitle" placeholder="عنوان العمل">
+    <input type="text" id="workDesc" placeholder="وصف العمل">
+    <input type="file" id="workImage">
+    <button onclick="addWork()">إضافة العمل</button>
+
+    <hr>
+
+    <h3>➕ إضافة تدوينة:</h3>
+    <input type="text" id="blogTitle" placeholder="عنوان التدوينة">
+    <textarea id="blogContent" placeholder="محتوى التدوينة"></textarea>
+    <button onclick="addBlog()">إضافة التدوينة</button>
   </div>
 
   <script type="module">
@@ -137,18 +158,36 @@
         document.getElementById("previewName").innerText = data.name;
         document.getElementById("previewBio").innerText = data.bio;
         document.getElementById("previewImage").src = data.imageUrl;
-
         document.getElementById("nameInput").value = data.name;
         document.getElementById("bioInput").value = data.bio;
       }
 
-      const portfolioSnap = await getDocs(collection(db, "portfolio"));
-      let html = "<h3>📂 أعمالي:</h3>";
+      const portfolioSnap = await getDocs(collection(db, "profile", "aycha", "portfolio"));
+      const portfolioDiv = document.getElementById("portfolio");
+      portfolioDiv.innerHTML = "";
       portfolioSnap.forEach(doc => {
-        const item = doc.data();
-        html += `<div style="margin-bottom: 1rem"><img src="${item.image}" style="max-width:100%;border:1px solid #ccc;border-radius:8px"><h4>${item.title}</h4><p>${item.description}</p></div>`;
+        const work = doc.data();
+        portfolioDiv.innerHTML += `
+          <div class="card">
+            <img src="${work.imageUrl}" alt="work">
+            <h3>${work.title}</h3>
+            <p>${work.description}</p>
+          </div>
+        `;
       });
-      document.getElementById("previewPortfolio").innerHTML = html;
+
+      const blogSnap = await getDocs(collection(db, "profile", "aycha", "blog"));
+      const blogDiv = document.getElementById("blog");
+      blogDiv.innerHTML = "";
+      blogSnap.forEach(doc => {
+        const post = doc.data();
+        blogDiv.innerHTML += `
+          <div class="card">
+            <h3>${post.title}</h3>
+            <p>${post.content}</p>
+          </div>
+        `;
+      });
     }
 
     window.saveName = async () => {
@@ -195,35 +234,48 @@
       }
     };
 
-    window.addProject = async () => {
-      const title = document.getElementById("projectTitle").value;
-      const description = document.getElementById("projectDesc").value;
-      const file = document.getElementById("projectImage").files[0];
-      if (!file || !title || !description) return alert("📝 يرجى ملء كل الحقول واختيار صورة");
+    window.addWork = async () => {
+      const title = document.getElementById("workTitle").value;
+      const description = document.getElementById("workDesc").value;
+      const file = document.getElementById("workImage").files[0];
+      if (!file || !title || !description) return alert("📥 أدخل كل المعلومات");
 
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "unsigned_preset");
-      formData.append("folder", "projects");
+      formData.append("folder", "portfolioImages");
 
-      try {
-        const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
-          method: "POST",
-          body: formData
+      const res = await fetch("https://api.cloudinary.com/v1_1/dmemmlkth/image/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.secure_url) {
+        await addDoc(collection(db, "profile", "aycha", "portfolio"), {
+          title,
+          description,
+          imageUrl: data.secure_url
         });
-        const data = await res.json();
-        if (data.secure_url) {
-          await addDoc(collection(db, "portfolio"), {
-            title,
-            description,
-            image: data.secure_url
-          });
-          alert("✅ تم إضافة العمل");
-          loadData();
-        }
-      } catch (e) {
-        alert("❌ فشل رفع صورة العمل");
+        alert("✅ تم إضافة العمل");
+        loadData();
+      } else {
+        alert("❌ فشل رفع الصورة");
       }
+    };
+
+    window.addBlog = async () => {
+      const title = document.getElementById("blogTitle").value;
+      const content = document.getElementById("blogContent").value;
+      if (!title || !content) return alert("📝 أدخل عنوان ومحتوى التدوينة");
+
+      await addDoc(collection(db, "profile", "aycha", "blog"), {
+        title,
+        content
+      });
+
+      alert("✅ تم إضافة التدوينة");
+      loadData();
     };
 
     loadData();
