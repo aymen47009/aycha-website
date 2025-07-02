@@ -44,11 +44,8 @@
           `;
 
           // 📝 إرسال الرابط إلى Firebase
-          firebase.database().ref("latestImage").set({
-            name: file.name,
-            url: data.secure_url,
-            uploadedAt: Date.now()
-          });
+          firebase.database().ref("profile/imageUrl").set(data.secure_url);
+
         } else {
           alert("حدث خطأ أثناء رفع الصورة.");
         }
