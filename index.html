@@ -54,18 +54,19 @@
       margin-top: 30px;
     }
 
-    .nav-buttons button {
+    .nav-buttons a {
+      display: inline-block;
       background-color: #f2c8ff;
-      border: none;
+      text-decoration: none;
+      color: #4a004a;
       padding: 12px 20px;
       margin: 5px;
       font-size: 1rem;
       border-radius: 20px;
-      cursor: pointer;
       transition: background-color 0.3s;
     }
 
-    .nav-buttons button:hover {
+    .nav-buttons a:hover {
       background-color: #e7aaff;
     }
   </style>
@@ -79,18 +80,16 @@
     <div class="countdown" id="countdown">العد التنازلي حتى العطلة الصيفية: ...</div>
     <div class="clock" id="clock">الساعة الآن: ...</div>
   </header>
-  
-  <a href="study.html">📚 دراستي</a>
 
   <div class="nav-buttons">
-    <button href="study.html" onclick="alert('نذهب إلى قسم الدراسة!')">📚 دراستي</button>
-    <button onclick="alert('نذهب إلى الرسومات!')">🎨 رسوماتي</button>
-    <button onclick="alert('نذهب إلى قصصي!')">📖 قصصي</button>
-    <button onclick="alert('نذهب إلى مذكراتي!')">📝 مذكراتي</button>
+    <a href="study.html">📚 دراستي</a>
+    <a href="#">🎨 رسوماتي</a>
+    <a href="#">📖 قصصي</a>
+    <a href="#">📝 مذكراتي</a>
   </div>
 
   <script>
-    // عداد للعطلة الصيفية (مثال: 1 سبتمبر)
+    // العطلة الصيفية في 1 سبتمبر 2025
     const targetDate = new Date("2025-09-01");
     const countdownEl = document.getElementById("countdown");
     const clockEl = document.getElementById("clock");
@@ -104,7 +103,9 @@
 
     function updateClock() {
       const now = new Date();
-      clockEl.textContent = `الساعة الآن: ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      clockEl.textContent = `الساعة الآن: ${hours}:${minutes}`;
     }
 
     setInterval(() => {
