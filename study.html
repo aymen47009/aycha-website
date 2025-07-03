@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>دراستي - عائشة</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #fff5fb;
+      color: #4a004a;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+    }
+
+    .section {
+      background-color: #ffe6f8;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #7a007a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table td, table th {
+      border: 1px solid #dba5d7;
+      padding: 10px;
+      text-align: center;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      resize: vertical;
+      margin-top: 10px;
+    }
+
+    button {
+      background-color: #f2c8ff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #e7aaff;
+    }
+
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📚 دراستي</h1>
+
+  <!-- 📅 الجدول الأسبوعي -->
+  <div class="section">
+    <h2>جدولي الأسبوعي</h2>
+    <table>
+      <tr>
+        <th>اليوم</th>
+        <th>المادة الأولى</th>
+        <th>المادة الثانية</th>
+        <th>ملاحظة</th>
+      </tr>
+      <tr>
+        <td>الأحد</td>
+        <td>رياضيات</td>
+        <td>عربية</td>
+        <td>🔆</td>
+      </tr>
+      <tr>
+        <td>الإثنين</td>
+        <td>فرنسية</td>
+        <td>قرآن</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>الثلاثاء</td>
+        <td>علوم</td>
+        <td>رياضيات</td>
+        <td></td>
+      </tr>
+      <!-- أضف المزيد حسب الجدول -->
+    </table>
+  </div>
+
+  <!-- 📝 دفتر الواجبات -->
+  <div class="section">
+    <h2>واجباتي اليوم</h2>
+    <textarea placeholder="اكتبي واجباتك هنا... مثل: حل تمرين صفحة 20 في الرياضيات."></textarea>
+    <br>
+    <button onclick="alert('تم حفظ الواجب!')">💾 حفظ</button>
+  </div>
+
+  <!-- 🧠 ملاحظات الدروس -->
+  <div class="section">
+    <h2>ملاحظات الدروس</h2>
+    <textarea placeholder="اكتبي ما فهمتِه اليوم من الدروس..."></textarea>
+    <br>
+    <button onclick="alert('تم حفظ الملاحظات!')">💾 حفظ</button>
+  </div>
+
+  <!-- 🎮 اختبار سريع -->
+  <div class="section">
+    <h2>اختبر نفسك!</h2>
+    <div class="quiz-question">
+      <strong>س١: ما هو ناتج 8 × 6؟</strong><br>
+      <input type="text" id="q1" placeholder="أدخلي الإجابة">
+    </div>
+    <div class="quiz-question">
+      <strong>س٢: ما عاصمة الجزائر؟</strong><br>
+      <input type="text" id="q2" placeholder="أدخلي الإجابة">
+    </div>
+    <button onclick="checkQuiz()">✅ تحقق من الإجابات</button>
+    <p id="quiz-result" style="color: green; font-weight: bold;"></p>
+  </div>
+
+  <script>
+    function checkQuiz() {
+      let score = 0;
+      if (document.getElementById("q1").value.trim() === "48") score++;
+      if (document.getElementById("q2").value.trim() === "الجزائر") score++;
+      document.getElementById("quiz-result").textContent = `لقد حصلتِ على ${score} من 2 🎉`;
+    }
+  </script>
+
+</body>
+</html>
