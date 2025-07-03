@@ -107,13 +107,14 @@
     </table>
   </div>
 
-  <!-- 📝 دفتر الواجبات -->
-  <div class="section">
-    <h2>واجباتي اليوم</h2>
-    <textarea placeholder="اكتبي واجباتك هنا... مثل: حل تمرين صفحة 20 في الرياضيات."></textarea>
-    <br>
-    <button onclick="alert('تم حفظ الواجب!')">💾 حفظ</button>
-  </div>
+  <h2>📝 واجباتي</h2>
+<div class="card">
+  <textarea id="homeworkInput" rows="5" placeholder="اكتبي واجبك هنا..." style="width: 100%; padding: 10px;"></textarea>
+  <br><br>
+  <button onclick="saveHomework()">💾 حفظ الواجب</button>
+  <p id="saveStatus" style="color: green;"></p>
+</div>
+
 
   <!-- 🧠 ملاحظات الدروس -->
   <div class="section">
@@ -145,6 +146,36 @@
       if (document.getElementById("q2").value.trim() === "الجزائر") score++;
       document.getElementById("quiz-result").textContent = `لقد حصلتِ على ${score} من 2 🎉`;
     }
+
+    import { addDoc, collection, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+async function saveHomework() {
+  const homeworkText = document.getElementById("homeworkInput").value.trim();
+  const status = document.getElementById("saveStatus");
+
+  if (homeworkText === "") {
+    status.textContent = "❌ الرجاء كتابة الواجب قبل الحفظ.";
+    status.style.color = "red";
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "profile", "aycha", "homework"), {
+      content: homeworkText,
+      date: Timestamp.now()
+    });
+
+    status.textContent = "✔ تم حفظ الواجب بنجاح!";
+    status.style.color = "green";
+    document.getElementById("homeworkInput").value = "";
+  } catch (error) {
+    console.error("حدث خطأ أثناء الحفظ:", error);
+    status.textContent = "❌ حدث خطأ أثناء الحفظ.";
+    status.style.color = "red";
+  }
+}
+
+
   </script>
 
 </body>
