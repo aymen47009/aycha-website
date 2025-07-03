@@ -115,6 +115,10 @@
     <button onclick="saveHomework()">💾 حفظ الواجب</button>
     <p id="saveStatus" style="color: green;"></p>
   </div>
+  
+  <h3>📋 قائمة واجباتي</h3>
+<div id="homeworkList" class="section" style="background-color:#fff; border: 1px solid #eee;"></div>
+
 
   <!-- 🧠 ملاحظات الدروس -->
   <div class="section">
@@ -139,58 +143,95 @@
     <p id="quiz-result" style="color: green; font-weight: bold;"></p>
   </div>
 
-  <script type="module">
-    // اختبار
-    function checkQuiz() {
-      let score = 0;
-      if (document.getElementById("q1").value.trim() === "48") score++;
-      if (document.getElementById("q2").value.trim() === "الجزائر") score++;
-      document.getElementById("quiz-result").textContent = `لقد حصلتِ على ${score} من 2 🎉`;
+<script type="module">
+  // ✅ استيراد Firebase
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { 
+    getFirestore, collection, addDoc, Timestamp, 
+    getDocs, query, orderBy 
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  // ✅ إعداد Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+    authDomain: "aycha-website.firebaseapp.com",
+    projectId: "aycha-website",
+    storageBucket: "aycha-website.appspot.com",
+    messagingSenderId: "488063935676",
+    appId: "1:488063935676:web:8a6450edd804d711db5cb9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // ✅ حفظ الواجب
+  window.saveHomework = async function () {
+    const homeworkText = document.getElementById("homeworkInput").value.trim();
+    const status = document.getElementById("saveStatus");
+
+    if (homeworkText === "") {
+      status.textContent = "❌ الرجاء كتابة الواجب قبل الحفظ.";
+      status.style.color = "red";
+      return;
     }
 
-    // Firebase إعداد
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getFirestore, collection, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+    try {
+      await addDoc(collection(db, "profile", "aycha", "homework"), {
+        content: homeworkText,
+        date: Timestamp.now()
+      });
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
-      authDomain: "aycha-website.firebaseapp.com",
-      projectId: "aycha-website",
-      storageBucket: "aycha-website.appspot.com",
-      messagingSenderId: "488063935676",
-      appId: "1:488063935676:web:8a6450edd804d711db5cb9"
-    };
+      status.textContent = "✔ تم حفظ الواجب بنجاح!";
+      status.style.color = "green";
+      document.getElementById("homeworkInput").value = "";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+      // تحديث قائمة الواجبات بعد الحفظ
+      await loadHomework();
 
-    // حفظ الواجب
-    window.saveHomework = async function () {
-      const homeworkText = document.getElementById("homeworkInput").value.trim();
-      const status = document.getElementById("saveStatus");
+    } catch (error) {
+      console.error("خطأ في الحفظ:", error);
+      status.textContent = "❌ حدث خطأ أثناء الحفظ.";
+      status.style.color = "red";
+    }
+  }
 
-      if (homeworkText === "") {
-        status.textContent = "❌ الرجاء كتابة الواجب قبل الحفظ.";
-        status.style.color = "red";
+  // ✅ تحميل وعرض الواجبات
+  async function loadHomework() {
+    const homeworkDiv = document.getElementById("homeworkList");
+    homeworkDiv.innerHTML = "⏳ جاري تحميل الواجبات...";
+
+    try {
+      const q = query(collection(db, "profile", "aycha", "homework"), orderBy("date", "desc"));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        homeworkDiv.innerHTML = "📭 لا يوجد واجبات محفوظة بعد.";
         return;
       }
 
-      try {
-        await addDoc(collection(db, "profile", "aycha", "homework"), {
-          content: homeworkText,
-          date: Timestamp.now()
-        });
+      homeworkDiv.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const date = data.date.toDate().toLocaleString('ar-DZ');
 
-        status.textContent = "✔ تم حفظ الواجب بنجاح!";
-        status.style.color = "green";
-        document.getElementById("homeworkInput").value = "";
-      } catch (error) {
-        console.error("خطأ في الحفظ:", error);
-        status.textContent = "❌ حدث خطأ أثناء الحفظ.";
-        status.style.color = "red";
-      }
+        homeworkDiv.innerHTML += `
+          <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+            <p style="margin:0;">📝 <strong>${data.content}</strong></p>
+            <small style="color: gray;">📅 ${date}</small>
+          </div>
+        `;
+      });
+
+    } catch (error) {
+      console.error("حدث خطأ أثناء تحميل الواجبات:", error);
+      homeworkDiv.innerHTML = "❌ تعذر تحميل الواجبات.";
     }
-  </script>
+  }
+
+  // ✅ عرض الواجبات عند فتح الصفحة
+  loadHomework();
+</script>
+
 
 </body>
 </html>
