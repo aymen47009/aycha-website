@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>موقع عائشة الشخصي</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(to bottom right, #f9eaff, #ffe6f0);
+      color: #4a004a;
+      text-align: center;
+    }
+
+    header {
+      background-color: #f6d8ff;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+
+    .avatar {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      margin-top: 15px;
+      border: 4px solid #fff;
+      box-shadow: 0 0 12px rgba(0,0,0,0.2);
+    }
+
+    .welcome {
+      font-size: 1.4rem;
+      margin-top: 15px;
+    }
+
+    .countdown {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #7a007a;
+    }
+
+    .clock {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #888;
+    }
+
+    .nav-buttons {
+      margin-top: 30px;
+    }
+
+    .nav-buttons button {
+      background-color: #f2c8ff;
+      border: none;
+      padding: 12px 20px;
+      margin: 5px;
+      font-size: 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .nav-buttons button:hover {
+      background-color: #e7aaff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>مرحباً، أنا عائشة 🌸</h1>
+    <img src="https://i.imgur.com/0y0y0y0.png" alt="صورة عائشة" class="avatar">
+    <p class="welcome">أهلاً بك في موقعي الشخصي، هنا أشارك دراستي، أفكاري، وموهبتي!</p>
+    <div class="countdown" id="countdown">العد التنازلي حتى العطلة الصيفية: ...</div>
+    <div class="clock" id="clock">الساعة الآن: ...</div>
+  </header>
+
+  <div class="nav-buttons">
+    <button onclick="alert('نذهب إلى قسم الدراسة!')">📚 دراستي</button>
+    <button onclick="alert('نذهب إلى الرسومات!')">🎨 رسوماتي</button>
+    <button onclick="alert('نذهب إلى قصصي!')">📖 قصصي</button>
+    <button onclick="alert('نذهب إلى مذكراتي!')">📝 مذكراتي</button>
+  </div>
+
+  <script>
+    // عداد للعطلة الصيفية (مثال: 1 سبتمبر)
+    const targetDate = new Date("2025-09-01");
+    const countdownEl = document.getElementById("countdown");
+    const clockEl = document.getElementById("clock");
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = targetDate - now;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      countdownEl.textContent = `العد التنازلي حتى العطلة الصيفية: ${days} يوم`;
+    }
+
+    function updateClock() {
+      const now = new Date();
+      clockEl.textContent = `الساعة الآن: ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+
+    setInterval(() => {
+      updateCountdown();
+      updateClock();
+    }, 1000);
+
+    updateCountdown();
+    updateClock();
+  </script>
+
+</body>
+</html>
