@@ -78,118 +78,129 @@
 
   <div id="hifdhTable"></div>
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import {
-      getFirestore, collection, addDoc, getDocs,
-      query, orderBy, Timestamp
-    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import {
+    getFirestore, collection, addDoc, getDocs,
+    query, orderBy, Timestamp
+  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
-      authDomain: "aycha-website.firebaseapp.com",
-      projectId: "aycha-website",
-      storageBucket: "aycha-website.appspot.com",
-      messagingSenderId: "488063935676",
-      appId: "1:488063935676:web:8a6450edd804d711db5cb9"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+    authDomain: "aycha-website.firebaseapp.com",
+    projectId: "aycha-website",
+    storageBucket: "aycha-website.appspot.com",
+    messagingSenderId: "488063935676",
+    appId: "1:488063935676:web:8a6450edd804d711db5cb9"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
+  const fields = ["dayInput", "surahInput", "fromInput", "toInput", "noteInput"];
+
+  fields.forEach((id, index) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const next = document.getElementById(fields[index + 1]);
+          if (next) next.focus();
+        }
+      });
+    }
+  });
+
+  window.saveHifdh = async function () {
+    const day = document.getElementById("dayInput").value;
+    const surah = document.getElementById("surahInput").value.trim();
+    const from = document.getElementById("fromInput").value.trim();
+    const to = document.getElementById("toInput").value.trim();
+    const note = document.getElementById("noteInput").value.trim();
     const status = document.getElementById("saveStatus");
 
-    // ✅ حفظ الحفظ
-    window.saveHifdh = async function () {
-      const day = document.getElementById("dayInput").value;
-      const surah = document.getElementById("surahInput").value.trim();
-      const from = document.getElementById("fromInput").value.trim();
-      const to = document.getElementById("toInput").value.trim();
-      const note = document.getElementById("noteInput").value.trim();
+    if (!day || !surah || !from || !to) {
+      status.textContent = "❌ الرجاء ملء كل الخانات.";
+      status.style.color = "red";
+      return;
+    }
 
-      if (!day || !surah || !from || !to) {
-        status.textContent = "❌ الرجاء ملء كل الخانات.";
-        status.style.color = "red";
+    try {
+      await addDoc(collection(db, "profile", "aycha", "quran"), {
+        day, surah, from, to, note, createdAt: Timestamp.now()
+      });
+
+      status.textContent = "✔ تم الحفظ!";
+      status.style.color = "green";
+
+      document.getElementById("fromInput").value = "";
+      document.getElementById("toInput").value = "";
+      document.getElementById("noteInput").value = "";
+
+      await loadLastSurah();
+      await showTable();
+    } catch (err) {
+      console.error(err);
+      status.textContent = "❌ حدث خطأ أثناء الحفظ.";
+      status.style.color = "red";
+    }
+  }
+
+  async function loadLastSurah() {
+    try {
+      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const last = snap.docs[0].data();
+        document.getElementById("surahInput").value = last.surah;
+      }
+    } catch (e) {
+      console.error("تعذر تحميل آخر سورة:", e);
+    }
+  }
+
+  async function showTable() {
+    const container = document.getElementById("hifdhTable");
+    container.innerHTML = "⏳ جاري تحميل الجدول...";
+
+    try {
+      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        container.innerHTML = "📭 لا يوجد حفظ بعد.";
         return;
       }
 
-      try {
-        await addDoc(collection(db, "profile", "aycha", "quran"), {
-          day, surah, from, to, note, createdAt: Timestamp.now()
-        });
+      let html = `<table><tr>
+        <th>📅 اليوم</th><th>📖 السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th>
+      </tr>`;
 
-        status.textContent = "✔ تم الحفظ!";
-        status.style.color = "green";
-
-        // إفراغ الحقول
-        document.getElementById("fromInput").value = "";
-        document.getElementById("toInput").value = "";
-        document.getElementById("noteInput").value = "";
-
-        await loadLastSurah();
-        await showTable();
-      } catch (err) {
-        console.error(err);
-        status.textContent = "❌ حدث خطأ أثناء الحفظ.";
-        status.style.color = "red";
-      }
-    }
-
-    // ✅ تحميل آخر سورة تلقائيًا
-    async function loadLastSurah() {
-      try {
-        const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          const last = snap.docs[0].data();
-          document.getElementById("surahInput").value = last.surah;
-        }
-      } catch (e) {
-        console.error("تعذر تحميل آخر سورة:", e);
-      }
-    }
-
-    // ✅ عرض الجدول
-    async function showTable() {
-      const container = document.getElementById("hifdhTable");
-      container.innerHTML = "⏳ جاري تحميل الجدول...";
-
-      try {
-        const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-
-        if (snap.empty) {
-          container.innerHTML = "📭 لا يوجد حفظ بعد.";
-          return;
-        }
-
-        let html = `<table><tr>
-          <th>📅 اليوم</th><th>📖 السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th>
+      snap.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>${d.day}</td>
+          <td>${d.surah}</td>
+          <td>${d.from}</td>
+          <td>${d.to}</td>
+          <td>${d.note || ""}</td>
         </tr>`;
+      });
 
-        snap.forEach(doc => {
-          const d = doc.data();
-          html += `<tr>
-            <td>${d.day}</td>
-            <td>${d.surah}</td>
-            <td>${d.from}</td>
-            <td>${d.to}</td>
-            <td>${d.note || ""}</td>
-          </tr>`;
-        });
+      html += `</table>`;
+      container.innerHTML = html;
 
-        html += `</table>`;
-        container.innerHTML = html;
-
-      } catch (err) {
-        console.error("خطأ في عرض الجدول:", err);
-        container.innerHTML = "❌ فشل في تحميل الجدول.";
-      }
+    } catch (err) {
+      console.error("خطأ في عرض الجدول:", err);
+      container.innerHTML = "❌ فشل في تحميل الجدول.";
     }
+  }
 
-    await loadLastSurah();
-    await showTable();
-  </script>
+  await loadLastSurah();
+  await showTable();
+</script>
+
 
 </body>
 </html>
