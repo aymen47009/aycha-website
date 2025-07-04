@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>دراستي - عائشة</title>
+  <title>📚 دراستي - عائشة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -12,13 +12,11 @@
       color: #4a004a;
       padding: 20px;
     }
-
     h1 {
       text-align: center;
       font-size: 2.2rem;
       margin-bottom: 30px;
     }
-
     .section {
       background-color: #ffe6f8;
       border-radius: 15px;
@@ -26,49 +24,41 @@
       margin-bottom: 30px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
-    .section h2 {
-      margin-top: 0;
-      font-size: 1.4rem;
-      color: #7a007a;
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
     }
-
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #e0a6ff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d183ff;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
-
-    table td, table th {
-      border: 1px solid #dba5d7;
+    th, td {
+      border: 1px solid #ddd;
       padding: 10px;
       text-align: center;
     }
-
-    textarea, input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      resize: vertical;
-      margin-top: 10px;
-    }
-
-    button {
-      background-color: #f2c8ff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 15px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #e7aaff;
-    }
-
-    .quiz-question {
-      margin-bottom: 15px;
+    th {
+      background-color: #ffd9f4;
     }
   </style>
 </head>
@@ -76,177 +66,160 @@
 
   <h1>📚 دراستي</h1>
 
-  <!-- 📅 الجدول الأسبوعي -->
+  <!-- 📝 إضافة واجب -->
   <div class="section">
-    <h2>جدولي الأسبوعي</h2>
-    <table>
-      <tr>
-        <th>اليوم</th>
-        <th>المادة الأولى</th>
-        <th>المادة الثانية</th>
-        <th>ملاحظة</th>
-      </tr>
-      <tr>
-        <td>الأحد</td>
-        <td>رياضيات</td>
-        <td>عربية</td>
-        <td>🔆</td>
-      </tr>
-      <tr>
-        <td>الإثنين</td>
-        <td>فرنسية</td>
-        <td>قرآن</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>الثلاثاء</td>
-        <td>علوم</td>
-        <td>رياضيات</td>
-        <td></td>
-      </tr>
-    </table>
-  </div>
+    <h2>✍️ أكتبي واجبك</h2>
+    <label>📘 المادة:</label>
+    <input id="subjectInput" type="text" placeholder="مثال: رياضيات">
 
-  <!-- 📝 واجباتي -->
-  <div class="section">
-    <h2>📝 واجباتي</h2>
-    <textarea id="homeworkInput" rows="5" placeholder="اكتبي واجبك هنا..."></textarea>
-    <br>
+    <label>📄 الصفحة:</label>
+    <input id="pageInput" type="number" placeholder="مثال: 20">
+
+    <label>🔢 رقم التمرين:</label>
+    <input id="exerciseInput" type="text" placeholder="مثال: تمرين 3">
+
+    <label>📆 تاريخ الإنجاز:</label>
+    <input id="dateInput" type="date">
+
+    <label>📍 مكان الإنجاز:</label>
+    <input id="placeInput" type="text" placeholder="مثال: في المنزل / المدرسة">
+
     <button onclick="saveHomework()">💾 حفظ الواجب</button>
-    <p id="saveStatus" style="color: green;"></p>
-  </div>
-  
-  <h3>📋 قائمة واجباتي</h3>
-  <div id="homeworkList" class="section" style="background-color:#fff; border: 1px solid #eee;"></div>
-
-  <!-- 🧠 ملاحظات الدروس -->
-  <div class="section">
-    <h2>ملاحظات الدروس</h2>
-    <textarea placeholder="اكتبي ما فهمتِه اليوم من الدروس..."></textarea>
-    <br>
-    <button onclick="alert('تم حفظ الملاحظات!')">💾 حفظ</button>
+    <p id="saveStatus"></p>
   </div>
 
-  <!-- 🎮 اختبار سريع -->
+  <!-- 📋 جدول الواجبات -->
   <div class="section">
-    <h2>اختبر نفسك!</h2>
-    <div class="quiz-question">
-      <strong>س١: ما هو ناتج 8 × 6؟</strong><br>
-      <input type="text" id="q1" placeholder="أدخلي الإجابة">
-    </div>
-    <div class="quiz-question">
-      <strong>س٢: ما عاصمة الجزائر؟</strong><br>
-      <input type="text" id="q2" placeholder="أدخلي الإجابة">
-    </div>
+    <h2>📋 جدول واجباتي</h2>
+    <div id="homeworkTable" style="overflow-x: auto;"></div>
+  </div>
+
+  <!-- 🎮 اختبار -->
+  <div class="section">
+    <h2>🎮 اختبر نفسك!</h2>
+    <p><strong>س١: ما هو ناتج 7 × 6؟</strong></p>
+    <input type="text" id="q1" placeholder="الإجابة">
+    <p><strong>س٢: ما عاصمة الجزائر؟</strong></p>
+    <input type="text" id="q2" placeholder="الإجابة">
     <button onclick="checkQuiz()">✅ تحقق من الإجابات</button>
-    <p id="quiz-result" style="color: green; font-weight: bold;"></p>
+    <p id="quiz-result" style="color: green;"></p>
   </div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { 
-    getFirestore, collection, addDoc, Timestamp, 
-    getDocs, query, orderBy, deleteDoc, doc 
-  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  <!-- ✅ Firebase و JavaScript -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import {
+      getFirestore, collection, addDoc, Timestamp,
+      getDocs, orderBy, query, deleteDoc, doc
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
-    authDomain: "aycha-website.firebaseapp.com",
-    projectId: "aycha-website",
-    storageBucket: "aycha-website.appspot.com",
-    messagingSenderId: "488063935676",
-    appId: "1:488063935676:web:8a6450edd804d711db5cb9"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+      authDomain: "aycha-website.firebaseapp.com",
+      projectId: "aycha-website",
+      storageBucket: "aycha-website.appspot.com",
+      messagingSenderId: "488063935676",
+      appId: "1:488063935676:web:8a6450edd804d711db5cb9"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  window.saveHomework = async function () {
-    const homeworkText = document.getElementById("homeworkInput").value.trim();
-    const status = document.getElementById("saveStatus");
+    // ✅ حفظ الواجب
+    window.saveHomework = async function () {
+      const subject = document.getElementById("subjectInput").value.trim();
+      const page = document.getElementById("pageInput").value.trim();
+      const exercise = document.getElementById("exerciseInput").value.trim();
+      const date = document.getElementById("dateInput").value;
+      const place = document.getElementById("placeInput").value.trim();
+      const status = document.getElementById("saveStatus");
 
-    if (homeworkText === "") {
-      status.textContent = "❌ الرجاء كتابة الواجب قبل الحفظ.";
-      status.style.color = "red";
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "profile", "aycha", "homework"), {
-        content: homeworkText,
-        date: Timestamp.now()
-      });
-
-      status.textContent = "✔ تم حفظ الواجب بنجاح!";
-      status.style.color = "green";
-      document.getElementById("homeworkInput").value = "";
-
-      await loadHomework();
-    } catch (error) {
-      console.error("خطأ في الحفظ:", error);
-      status.textContent = "❌ حدث خطأ أثناء الحفظ.";
-      status.style.color = "red";
-    }
-  }
-
-  async function loadHomework() {
-    const homeworkDiv = document.getElementById("homeworkList");
-    homeworkDiv.innerHTML = "⏳ جاري تحميل الواجبات...";
-
-    try {
-      const q = query(collection(db, "profile", "aycha", "homework"), orderBy("date", "desc"));
-      const snapshot = await getDocs(q);
-
-      if (snapshot.empty) {
-        homeworkDiv.innerHTML = "📭 لا يوجد واجبات محفوظة بعد.";
+      if (!subject || !page || !exercise || !date || !place) {
+        status.textContent = "❌ الرجاء ملء كل الخانات.";
+        status.style.color = "red";
         return;
       }
 
-      homeworkDiv.innerHTML = "";
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const id = docSnap.id;
-        const date = data.date.toDate().toLocaleString('ar-DZ');
+      try {
+        await addDoc(collection(db, "profile", "aycha", "homework"), {
+          subject, page, exercise, date, place, createdAt: Timestamp.now()
+        });
+        status.textContent = "✔ تم حفظ الواجب!";
+        status.style.color = "green";
 
-        homeworkDiv.innerHTML += `
-          <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <p style="margin:0;">📝 <strong>${data.content}</strong></p>
-              <small style="color: gray;">📅 ${date}</small>
-            </div>
-            <button onclick="deleteHomework('${id}')" style="background-color:#ffcdd2; color:#900; border:none; border-radius:5px; padding:5px 10px;">❌</button>
-          </div>
-        `;
-      });
+        document.getElementById("subjectInput").value = "";
+        document.getElementById("pageInput").value = "";
+        document.getElementById("exerciseInput").value = "";
+        document.getElementById("dateInput").value = "";
+        document.getElementById("placeInput").value = "";
 
-    } catch (error) {
-      console.error("حدث خطأ أثناء تحميل الواجبات:", error);
-      homeworkDiv.innerHTML = "❌ تعذر تحميل الواجبات.";
-    }
-  }
+        await loadHomeworkTable();
+      } catch (err) {
+        console.error(err);
+        status.textContent = "❌ خطأ أثناء الحفظ.";
+        status.style.color = "red";
+      }
+    };
 
-  window.deleteHomework = async function (homeworkId) {
-    const confirmDelete = confirm("هل تريدين حذف هذا الواجب؟");
-    if (!confirmDelete) return;
+    // ✅ عرض الواجبات في جدول
+    window.loadHomeworkTable = async function () {
+      const container = document.getElementById("homeworkTable");
+      container.innerHTML = "⏳ جاري التحميل...";
 
-    try {
-      await deleteDoc(doc(db, "profile", "aycha", "homework", homeworkId));
-      await loadHomework();
-    } catch (error) {
-      console.error("خطأ في حذف الواجب:", error);
-      alert("❌ تعذر حذف الواجب.");
-    }
-  }
+      try {
+        const q = query(collection(db, "profile", "aycha", "homework"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
 
-  function checkQuiz() {
-    let score = 0;
-    if (document.getElementById("q1").value.trim() === "48") score++;
-    if (document.getElementById("q2").value.trim() === "الجزائر") score++;
-    document.getElementById("quiz-result").textContent = `لقد حصلتِ على ${score} من 2 🎉`;
-  }
+        if (snapshot.empty) {
+          container.innerHTML = "📭 لا توجد واجبات.";
+          return;
+        }
 
-  loadHomework();
-</script>
+        let html = `<table><tr>
+          <th>📘 المادة</th><th>📄 الصفحة</th><th>🔢 التمرين</th>
+          <th>📆 التاريخ</th><th>📍 المكان</th><th>🗑️ حذف</th>
+        </tr>`;
+
+        snapshot.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          html += `<tr>
+            <td>${d.subject}</td>
+            <td>${d.page}</td>
+            <td>${d.exercise}</td>
+            <td>${d.date}</td>
+            <td>${d.place}</td>
+            <td><button onclick="deleteHomework('${id}')">❌</button></td>
+          </tr>`;
+        });
+
+        html += `</table>`;
+        container.innerHTML = html;
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "❌ فشل في تحميل البيانات.";
+      }
+    };
+
+    // 🗑️ حذف واجب
+    window.deleteHomework = async function (id) {
+      if (confirm("هل تريدين حذف هذا الواجب؟")) {
+        await deleteDoc(doc(db, "profile", "aycha", "homework", id));
+        await loadHomeworkTable();
+      }
+    };
+
+    // 🧠 اختبار ذاتي
+    window.checkQuiz = function () {
+      let score = 0;
+      if (document.getElementById("q1").value.trim() === "42") score++;
+      if (document.getElementById("q2").value.trim() === "الجزائر") score++;
+      document.getElementById("quiz-result").textContent = `🎉 نتيجتك: ${score} من 2`;
+    };
+
+    // ✅ تحميل الواجبات عند فتح الصفحة
+    loadHomeworkTable();
+  </script>
 
 </body>
 </html>
