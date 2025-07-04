@@ -1,213 +1,237 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📖 حفظي للقرآن - عائشة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>📖 جدول حفظ القرآن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background-color: #f9f6ff;
-      color: #4a004a;
+      background-color: #fef6ff;
       padding: 20px;
+      color: #4a004a;
     }
-    h1 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 20px;
+
+    .section {
+      background-color: #fff0fa;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
+
     label {
+      font-weight: bold;
       display: block;
       margin-top: 10px;
-      font-weight: bold;
     }
+
     input, textarea {
       width: 100%;
       padding: 8px;
-      margin-top: 5px;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
+      margin-top: 5px;
+      font-size: 16px;
     }
+
     button {
       margin-top: 15px;
       padding: 10px 20px;
-      background-color: #d5b6ff;
+      background-color: #f4b5ff;
       border: none;
       border-radius: 10px;
       cursor: pointer;
     }
+
+    button:hover {
+      background-color: #e999f8;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 15px;
     }
+
     th, td {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
     }
+
     th {
-      background-color: #efdcff;
+      background-color: #fbd6ff;
     }
-
-    input[type="date"] {
-     font-family: Arial, sans-serif;
-     font-feature-settings: "lnum";
-     direction: ltr;
-    }
-
   </style>
 </head>
 <body>
 
-  <h1>📖 جدول حفظي للقرآن</h1>
+  <h1 style="text-align:center;">📖 جدول حفظ القرآن - عائشة</h1>
 
-  <div>
+  <div class="section">
     <label>📅 اليوم:</label>
-    <input type="date" id="dayInput" lang="en" style="font-family: Arial; font-feature-settings: 'lnum'; direction: ltr;" />
+    <input id="dayInput" placeholder="اختاري اليوم" />
 
-    <label>📖 السورة:</label>
-    <input type="text" id="surahInput">
+    <label>🕋 السورة:</label>
+    <input type="text" id="surahInput" placeholder="مثال: الكهف" />
 
-    <label>من الآية:</label>
-    <input type="number" id="fromInput">
+    <label>من:</label>
+    <input type="text" id="fromInput" placeholder="الآية من" />
 
-    <label>إلى الآية:</label>
-    <input type="number" id="toInput">
+    <label>إلى:</label>
+    <input type="text" id="toInput" placeholder="الآية إلى" />
 
-    <label>📝 ملاحظة:</label>
-    <textarea id="noteInput" rows="2" placeholder="مثلاً: أخطأت في الآية 3"></textarea>
+    <label>ملاحظة:</label>
+    <textarea id="noteInput" placeholder="أي ملاحظة إضافية..."></textarea>
 
-    <button onclick="saveHifdh()">💾 حفظ الحفظ</button>
-    <p id="saveStatus"></p>
+    <button onclick="saveHifdh()">💾 حفظ</button>
+    <p id="saveStatus" style="color: green;"></p>
   </div>
 
-  <div id="hifdhTable"></div>
+  <div id="hifdhTable" class="section">
+    <h2>📋 محفوظاتك السابقة</h2>
+    ⏳ جاري التحميل...
+  </div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import {
-    getFirestore, collection, addDoc, getDocs,
-    query, orderBy, Timestamp
-  } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
-    authDomain: "aycha-website.firebaseapp.com",
-    projectId: "aycha-website",
-    storageBucket: "aycha-website.appspot.com",
-    messagingSenderId: "488063935676",
-    appId: "1:488063935676:web:8a6450edd804d711db5cb9"
-  };
+  <!-- Firebase + JavaScript -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import {
+      getFirestore, collection, addDoc, getDocs,
+      query, orderBy, Timestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
+      authDomain: "aycha-website.firebaseapp.com",
+      projectId: "aycha-website",
+      storageBucket: "aycha-website.appspot.com",
+      messagingSenderId: "488063935676",
+      appId: "1:488063935676:web:8a6450edd804d711db5cb9"
+    };
 
-  const fields = ["dayInput", "surahInput", "fromInput", "toInput", "noteInput"];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  fields.forEach((id, index) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("keydown", function (e) {
+    // تفعيل التقويم Flatpickr
+    flatpickr("#dayInput", {
+      dateFormat: "Y-m-d",
+      locale: "en"
+    });
+
+    const fields = ["dayInput", "surahInput", "fromInput", "toInput", "noteInput"];
+    fields.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
           e.preventDefault();
-          const next = document.getElementById(fields[index + 1]);
+          const next = document.getElementById(fields[i + 1]);
           if (next) next.focus();
         }
       });
-    }
-  });
+    });
 
-  window.saveHifdh = async function () {
-    const day = document.getElementById("dayInput").value;
-    const surah = document.getElementById("surahInput").value.trim();
-    const from = document.getElementById("fromInput").value.trim();
-    const to = document.getElementById("toInput").value.trim();
-    const note = document.getElementById("noteInput").value.trim();
-    const status = document.getElementById("saveStatus");
+    window.saveHifdh = async function () {
+      const day = document.getElementById("dayInput").value;
+      const surah = document.getElementById("surahInput").value.trim();
+      const from = document.getElementById("fromInput").value.trim();
+      const to = document.getElementById("toInput").value.trim();
+      const note = document.getElementById("noteInput").value.trim();
+      const status = document.getElementById("saveStatus");
 
-    if (!day || !surah || !from || !to) {
-      status.textContent = "❌ الرجاء ملء كل الخانات.";
-      status.style.color = "red";
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "profile", "aycha", "quran"), {
-        day, surah, from, to, note, createdAt: Timestamp.now()
-      });
-
-      status.textContent = "✔ تم الحفظ!";
-      status.style.color = "green";
-
-      document.getElementById("fromInput").value = "";
-      document.getElementById("toInput").value = "";
-      document.getElementById("noteInput").value = "";
-
-      await loadLastSurah();
-      await showTable();
-    } catch (err) {
-      console.error(err);
-      status.textContent = "❌ حدث خطأ أثناء الحفظ.";
-      status.style.color = "red";
-    }
-  }
-
-  async function loadLastSurah() {
-    try {
-      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const last = snap.docs[0].data();
-        document.getElementById("surahInput").value = last.surah;
-      }
-    } catch (e) {
-      console.error("تعذر تحميل آخر سورة:", e);
-    }
-  }
-
-  async function showTable() {
-    const container = document.getElementById("hifdhTable");
-    container.innerHTML = "⏳ جاري تحميل الجدول...";
-
-    try {
-      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
-
-      if (snap.empty) {
-        container.innerHTML = "📭 لا يوجد حفظ بعد.";
+      if (!day || !surah || !from || !to) {
+        status.textContent = "❌ الرجاء ملء جميع الحقول.";
+        status.style.color = "red";
         return;
       }
 
-      let html = `<table><tr>
-        <th>📅 اليوم</th><th>📖 السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th>
-      </tr>`;
+      try {
+        await addDoc(collection(db, "profile", "aycha", "quran"), {
+          day, surah, from, to, note, createdAt: Timestamp.now()
+        });
 
-      snap.forEach(doc => {
-        const d = doc.data();
-        html += `<tr>
-          <td>${d.day}</td>
-          <td>${d.surah}</td>
-          <td>${d.from}</td>
-          <td>${d.to}</td>
-          <td>${d.note || ""}</td>
-        </tr>`;
-      });
+        status.textContent = "✔ تم حفظ الحفظ!";
+        status.style.color = "green";
 
-      html += `</table>`;
-      container.innerHTML = html;
+        // تفريغ الحقول ماعدا السورة
+        document.getElementById("fromInput").value = "";
+        document.getElementById("toInput").value = "";
+        document.getElementById("noteInput").value = "";
 
-    } catch (err) {
-      console.error("خطأ في عرض الجدول:", err);
-      container.innerHTML = "❌ فشل في تحميل الجدول.";
+        await loadLastSurah();
+        await showTable();
+
+      } catch (err) {
+        console.error(err);
+        status.textContent = "❌ حدث خطأ أثناء الحفظ.";
+        status.style.color = "red";
+      }
     }
-  }
 
-  await loadLastSurah();
-  await showTable();
-</script>
+    async function loadLastSurah() {
+      try {
+        const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const last = snap.docs[0].data();
+          document.getElementById("surahInput").value = last.surah;
+        }
+      } catch (e) {
+        console.error("تعذر تحميل آخر سورة:", e);
+      }
+    }
 
+    async function showTable() {
+      const container = document.getElementById("hifdhTable");
 
+      try {
+        const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          container.innerHTML = "<p>📭 لا يوجد محفوظات حتى الآن.</p>";
+          return;
+        }
+
+        let html = `<table><tr>
+          <th>📅 اليوم</th>
+          <th>🕋 السورة</th>
+          <th>من</th>
+          <th>إلى</th>
+          <th>ملاحظة</th>
+        </tr>`;
+
+        snap.forEach(doc => {
+          const d = doc.data();
+          html += `<tr>
+            <td>${d.day}</td>
+            <td>${d.surah}</td>
+            <td>${d.from}</td>
+            <td>${d.to}</td>
+            <td>${d.note || ""}</td>
+          </tr>`;
+        });
+
+        html += `</table>`;
+        container.innerHTML = html;
+
+      } catch (err) {
+        console.error("خطأ في عرض الجدول:", err);
+        container.innerHTML = "❌ فشل في تحميل الجدول.";
+      }
+    }
+
+    await loadLastSurah();
+    await showTable();
+  </script>
 </body>
 </html>
