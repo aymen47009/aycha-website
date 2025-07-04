@@ -117,8 +117,7 @@
   </div>
   
   <h3>📋 قائمة واجباتي</h3>
-<div id="homeworkList" class="section" style="background-color:#fff; border: 1px solid #eee;"></div>
-
+  <div id="homeworkList" class="section" style="background-color:#fff; border: 1px solid #eee;"></div>
 
   <!-- 🧠 ملاحظات الدروس -->
   <div class="section">
@@ -144,14 +143,12 @@
   </div>
 
 <script type="module">
-  // ✅ استيراد Firebase
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { 
     getFirestore, collection, addDoc, Timestamp, 
-    getDocs, query, orderBy 
+    getDocs, query, orderBy, deleteDoc, doc 
   } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-  // ✅ إعداد Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyDK3CqwJEB6uG8npPCG6jQqzqkUbI6vjJs",
     authDomain: "aycha-website.firebaseapp.com",
@@ -164,7 +161,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // ✅ حفظ الواجب
   window.saveHomework = async function () {
     const homeworkText = document.getElementById("homeworkInput").value.trim();
     const status = document.getElementById("saveStatus");
@@ -185,9 +181,7 @@
       status.style.color = "green";
       document.getElementById("homeworkInput").value = "";
 
-      // تحديث قائمة الواجبات بعد الحفظ
       await loadHomework();
-
     } catch (error) {
       console.error("خطأ في الحفظ:", error);
       status.textContent = "❌ حدث خطأ أثناء الحفظ.";
@@ -195,7 +189,6 @@
     }
   }
 
-  // ✅ تحميل وعرض الواجبات
   async function loadHomework() {
     const homeworkDiv = document.getElementById("homeworkList");
     homeworkDiv.innerHTML = "⏳ جاري تحميل الواجبات...";
@@ -210,14 +203,18 @@
       }
 
       homeworkDiv.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const id = docSnap.id;
         const date = data.date.toDate().toLocaleString('ar-DZ');
 
         homeworkDiv.innerHTML += `
-          <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-            <p style="margin:0;">📝 <strong>${data.content}</strong></p>
-            <small style="color: gray;">📅 ${date}</small>
+          <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <p style="margin:0;">📝 <strong>${data.content}</strong></p>
+              <small style="color: gray;">📅 ${date}</small>
+            </div>
+            <button onclick="deleteHomework('${id}')" style="background-color:#ffcdd2; color:#900; border:none; border-radius:5px; padding:5px 10px;">❌</button>
           </div>
         `;
       });
@@ -228,10 +225,28 @@
     }
   }
 
-  // ✅ عرض الواجبات عند فتح الصفحة
+  window.deleteHomework = async function (homeworkId) {
+    const confirmDelete = confirm("هل تريدين حذف هذا الواجب؟");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDoc(doc(db, "profile", "aycha", "homework", homeworkId));
+      await loadHomework();
+    } catch (error) {
+      console.error("خطأ في حذف الواجب:", error);
+      alert("❌ تعذر حذف الواجب.");
+    }
+  }
+
+  function checkQuiz() {
+    let score = 0;
+    if (document.getElementById("q1").value.trim() === "48") score++;
+    if (document.getElementById("q2").value.trim() === "الجزائر") score++;
+    document.getElementById("quiz-result").textContent = `لقد حصلتِ على ${score} من 2 🎉`;
+  }
+
   loadHomework();
 </script>
-
 
 </body>
 </html>
