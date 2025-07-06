@@ -136,7 +136,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import {
       getFirestore, collection, addDoc, getDocs,
-      query, orderBy, Timestamp
+      query, orderBy, Timestamp, deleteDoc, doc
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     const firebaseConfig = {
@@ -187,30 +187,40 @@
     }
 
     async function showHomework() {
-      const container = document.getElementById("homeworkList");
-      container.innerHTML = "⏳ جاري التحميل...";
-      const q = query(collection(db, "profile", "aycha", "homework"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
+  const container = document.getElementById("homeworkList");
+  container.innerHTML = "⏳ جاري التحميل...";
+  const q = query(collection(db, "profile", "aycha", "homework"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
 
-      if (snap.empty) {
-        container.innerHTML = "📭 لا توجد واجبات بعد.";
-        return;
-      }
+  if (snap.empty) {
+    container.innerHTML = "📭 لا توجد واجبات بعد.";
+    return;
+  }
 
-      let html = `<table><tr><th>المادة</th><th>الصفحة</th><th>التمرين</th><th>التاريخ</th><th>المكان</th></tr>`;
-      snap.forEach(doc => {
-        const d = doc.data();
-        html += `<tr>
-          <td>${d.subject}</td>
-          <td>${d.page}</td>
-          <td>${d.exercise}</td>
-          <td>${d.date}</td>
-          <td>${d.place}</td>
-        </tr>`;
-      });
-      html += "</table>";
-      container.innerHTML = html;
-    }
+  let html = `<table><tr><th>المادة</th><th>الصفحة</th><th>التمرين</th><th>التاريخ</th><th>المكان</th><th>❌ حذف</th></tr>`;
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const id = docSnap.id;
+    html += `<tr>
+      <td>${d.subject}</td>
+      <td>${d.page}</td>
+      <td>${d.exercise}</td>
+      <td>${d.date}</td>
+      <td>${d.place}</td>
+      <td><button onclick="deleteHomework('${id}')">🗑️</button></td>
+    </tr>`;
+  });
+  html += "</table>";
+  container.innerHTML = html;
+}
+ 
+window.deleteHomework = async function(id) {
+  if (confirm("هل أنت متأكد أنك تريد حذف هذا الواجب؟")) {
+    await deleteDoc(doc(db, "profile", "aycha", "homework", id));
+    showHomework(); // تحديث الجدول بعد الحذف
+  }
+}
+
 
     // ✅ كود جدول الحفظ
     window.saveQuran = async function () {
@@ -252,30 +262,40 @@
     }
 
     async function showQuran() {
-      const container = document.getElementById("quranList");
-      container.innerHTML = "⏳ جاري التحميل...";
-      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
+  const container = document.getElementById("quranList");
+  container.innerHTML = "⏳ جاري التحميل...";
+  const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
 
-      if (snap.empty) {
-        container.innerHTML = "📭 لا يوجد محفوظات.";
-        return;
-      }
+  if (snap.empty) {
+    container.innerHTML = "📭 لا يوجد محفوظات.";
+    return;
+  }
 
-      let html = `<table><tr><th>اليوم</th><th>السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th></tr>`;
-      snap.forEach(doc => {
-        const d = doc.data();
-        html += `<tr>
-          <td>${d.day}</td>
-          <td>${d.surah}</td>
-          <td>${d.from}</td>
-          <td>${d.to}</td>
-          <td>${d.note}</td>
-        </tr>`;
-      });
-      html += `</table>`;
-      container.innerHTML = html;
-    }
+  let html = `<table><tr><th>اليوم</th><th>السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th><th>❌ حذف</th></tr>`;
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const id = docSnap.id;
+    html += `<tr>
+      <td>${d.day}</td>
+      <td>${d.surah}</td>
+      <td>${d.from}</td>
+      <td>${d.to}</td>
+      <td>${d.note}</td>
+      <td><button onclick="deleteQuran('${id}')">🗑️</button></td>
+    </tr>`;
+  });
+  html += `</table>`;
+  container.innerHTML = html;
+}
+
+window.deleteQuran = async function(id) {
+  if (confirm("هل أنت متأكد أنك تريد حذف هذا الحفظ؟")) {
+    await deleteDoc(doc(db, "profile", "aycha", "quran", id));
+    showQuran(); // تحديث الجدول بعد الحذف
+  }
+}
+
 
     // تحميل البيانات عند فتح الصفحة
     showHomework();
