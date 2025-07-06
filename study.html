@@ -443,7 +443,7 @@ async function showGoals() {
   container.innerHTML = html;
 }
 
-// ⏱️ عد تنازلي + إشعار
+// ⏱️ عد تنازلي + إشعار + صوت
 function startCountdown(elementId, targetDate, goalText) {
   const el = document.getElementById(elementId);
   const interval = setInterval(() => {
@@ -453,6 +453,7 @@ function startCountdown(elementId, targetDate, goalText) {
     if (diff <= 0) {
       el.textContent = "⏰ تم الوصول للموعد!";
       sendNotification("انتهى وقت الهدف 🎯", `الهدف: ${goalText}`);
+      playAlarmSound(); // ✅ تشغيل الصوت
       clearInterval(interval);
     } else {
       const hrs = Math.floor(diff / (1000 * 60 * 60));
@@ -462,6 +463,7 @@ function startCountdown(elementId, targetDate, goalText) {
     }
   }, 1000);
 }
+
 
 // 🔔 إشعارات
 function sendNotification(title, body) {
@@ -475,6 +477,16 @@ function sendNotification(title, body) {
     });
   }
 }
+
+// 🔊 دالة لتشغيل صوت التنبيه
+function playAlarmSound() {
+  const audio = new Audio("alarm.mp3");
+  audio.play().catch(err => {
+    console.warn("⚠️ فشل تشغيل الصوت، قد يكون بسبب عدم تفاعل المستخدم مع الصفحة أولاً.");
+    console.error(err);
+  });
+}
+
 
 // تشغيل عند الفتح
 showGoals();
