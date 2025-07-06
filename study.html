@@ -167,15 +167,6 @@
     <div id="quranList"></div>
   </div>
 
-  <!-- 🎯 القسم 3: أهدافي الأسبوعية -->
-<div class="section">
-  <h2>🎯 أهدافي لهذا الأسبوع</h2>
-  <input type="text" id="goalInput" placeholder="اكتبي هدفك هنا..." />
-  <button onclick="addGoal()">➕ أضف الهدف</button>
-  <ul id="goalList" style="margin-top:15px;"></ul>
-</div>
-
-
 <!-- 🎯 قسم الأهداف الأسبوعية -->
 <div class="section">
   <h2>🎯 أهدافي لهذا الأسبوع</h2>
@@ -408,6 +399,7 @@ window.saveGoal = async function () {
     console.error(err);
   }
 }
+
 
 window.deleteGoal = async function(id) {
   if (confirm("هل تريدين حذف هذا الهدف؟")) {
