@@ -179,12 +179,18 @@ window.deleteHomework = async function (id) {
 }
 
 window.saveQuran = async function () {
+  const qDate = document.getElementById("qDate");
+  const suraInput = document.getElementById("sura");
+  const fromInput = document.getElementById("from");
+  const toInput = document.getElementById("to");
+  const noteInput = document.getElementById("note");
+  const status = document.getElementById("qStatus");
+
   const date = qDate.value;
   const sura = suraInput.value.trim();
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const note = noteInput.value.trim();
-  const status = document.getElementById("qStatus");
 
   if (!date || !sura || !from || !to) {
     status.textContent = "❌ يرجى ملء الحقول المطلوبة.";
@@ -200,6 +206,7 @@ window.saveQuran = async function () {
   qDate.value = suraInput.value = fromInput.value = toInput.value = noteInput.value = "";
   showQuran();
 }
+
 
 async function showQuran() {
   const div = document.getElementById("quranList");
