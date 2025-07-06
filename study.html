@@ -92,6 +92,29 @@
   transform: scale(1.4);
 }
 
+
+.goal-item {
+  background-color: #ffe4f4;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.goal-item span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.goal-item .countdown {
+  color: #7a007a;
+  font-weight: bold;
+}
+
+.goal-item button {
+  background-color: #ffb3c6;
+  margin-top: 10px;
+}
   </style>
 </head>
 <body>
@@ -150,6 +173,23 @@
   <input type="text" id="goalInput" placeholder="اكتبي هدفك هنا..." />
   <button onclick="addGoal()">➕ أضف الهدف</button>
   <ul id="goalList" style="margin-top:15px;"></ul>
+</div>
+
+
+<!-- 🎯 قسم الأهداف الأسبوعية -->
+<div class="section">
+  <h2>🎯 أهدافي لهذا الأسبوع</h2>
+
+  <label>🎯 الهدف:</label>
+  <input type="text" id="goalText" placeholder="مثال: إتمام حفظ سورة الملك" />
+
+  <label>📅 تاريخ الإنجاز:</label>
+  <input type="datetime-local" id="goalDate" />
+
+  <button onclick="saveGoal()">💾 حفظ الهدف</button>
+  <p id="goalStatus"></p>
+
+  <div id="goalList" style="margin-top: 20px;"></div>
 </div>
 
   <!-- Flatpickr -->
@@ -337,6 +377,118 @@ window.deleteQuran = async function(id) {
     input.value = "";
   }
 }
+
+
+import { deleteDoc, doc, setDoc, getDocs, collection, Timestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+window.saveGoal = async function () {
+  const text = document.getElementById("goalText").value.trim();
+  const date = document.getElementById("goalDate").value;
+  const status = document.getElementById("goalStatus");
+
+  if (!text || !date) {
+    status.textContent = "❌ الرجاء إدخال الهدف وتاريخ الإنجاز.";
+    status.style.color = "red";
+    return;
+  }
+
+  try {
+    const goalId = Date.now().toString(); // ID مؤقت
+    await setDoc(doc(db, "profile", "aycha", "goals", goalId), {
+      text,
+      date,
+      createdAt: Timestamp.now()
+    });
+    status.textContent = "✔ تم حفظ الهدف!";
+    status.style.color = "green";
+    showGoals();
+  } catch (err) {
+    status.textContent = "❌ حدث خطأ أثناء الحفظ.";
+    status.style.color = "red";
+    console.error(err);
+  }
+}
+
+window.deleteGoal = async function(id) {
+  if (confirm("هل تريدين حذف هذا الهدف؟")) {
+    await deleteDoc(doc(db, "profile", "aycha", "goals", id));
+    showGoals();
+  }
+}
+
+async function showGoals() {
+  const container = document.getElementById("goalList");
+  container.innerHTML = "⏳ تحميل الأهداف...";
+  const q = query(collection(db, "profile", "aycha", "goals"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    container.innerHTML = "📭 لا توجد أهداف بعد.";
+    return;
+  }
+
+  let html = "";
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const id = docSnap.id;
+    const date = new Date(d.date);
+    const now = new Date();
+    const remaining = date - now;
+    const countdownId = "countdown_" + id;
+
+    html += `
+      <div class="goal-item">
+        <span>🎯 ${d.text}</span>
+        <span>📅 الموعد: ${d.date}</span>
+        <span class="countdown" id="${countdownId}">⏳ تحميل الوقت المتبقي...</span>
+        <button onclick="deleteGoal('${id}')">🗑️ حذف</button>
+      </div>
+    `;
+
+    // مؤقت التنازلي
+    setTimeout(() => {
+      startCountdown(countdownId, new Date(d.date), d.text);
+    }, 100);
+  });
+
+  container.innerHTML = html;
+}
+
+// ⏱️ عد تنازلي + إشعار
+function startCountdown(elementId, targetDate, goalText) {
+  const el = document.getElementById(elementId);
+  const interval = setInterval(() => {
+    const now = new Date();
+    const diff = targetDate - now;
+
+    if (diff <= 0) {
+      el.textContent = "⏰ تم الوصول للموعد!";
+      sendNotification("انتهى وقت الهدف 🎯", `الهدف: ${goalText}`);
+      clearInterval(interval);
+    } else {
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+      el.textContent = `⏳ الوقت المتبقي: ${hrs} س ${mins} د ${secs} ث`;
+    }
+  }, 1000);
+}
+
+// 🔔 إشعارات
+function sendNotification(title, body) {
+  if (Notification.permission === "granted") {
+    new Notification(title, { body });
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        new Notification(title, { body });
+      }
+    });
+  }
+}
+
+// تشغيل عند الفتح
+showGoals();
 
   </script>
 </body>
