@@ -369,9 +369,6 @@ window.deleteQuran = async function(id) {
   }
 }
 
-
-import { deleteDoc, doc, setDoc, getDocs, collection, Timestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
 window.saveGoal = async function () {
   const text = document.getElementById("goalText").value.trim();
   const date = document.getElementById("goalDate").value;
