@@ -76,6 +76,22 @@
     th {
       background-color: #fbd6ff;
     }
+
+    #goalList li {
+  background: #ffe4f4;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 10px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#goalList input[type="checkbox"] {
+  transform: scale(1.4);
+}
+
   </style>
 </head>
 <body>
@@ -127,6 +143,14 @@
     <p id="quranStatus"></p>
     <div id="quranList"></div>
   </div>
+
+  <!-- 🎯 القسم 3: أهدافي الأسبوعية -->
+<div class="section">
+  <h2>🎯 أهدافي لهذا الأسبوع</h2>
+  <input type="text" id="goalInput" placeholder="اكتبي هدفك هنا..." />
+  <button onclick="addGoal()">➕ أضف الهدف</button>
+  <ul id="goalList" style="margin-top:15px;"></ul>
+</div>
 
   <!-- Flatpickr -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -301,6 +325,19 @@ window.deleteQuran = async function(id) {
     showHomework();
     showQuran();
     loadLastSurah();
+
+    window.addGoal = function () {
+  const input = document.getElementById("goalInput");
+  const goalText = input.value.trim();
+  if (goalText) {
+    const ul = document.getElementById("goalList");
+    const li = document.createElement("li");
+    li.innerHTML = `<input type="checkbox" /> ${goalText}`;
+    ul.appendChild(li);
+    input.value = "";
+  }
+}
+
   </script>
 </body>
 </html>
