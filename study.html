@@ -104,7 +104,7 @@
 <div class="section">
   <h2>حفظي للقرآن الكريم</h2>
   <input id="qDate" placeholder="اليوم" />
-  <input id="sura" placeholder="السورة" />
+  <input id="surah" placeholder="السورة" />
   <input id="from" placeholder="من آية" />
   <input id="to" placeholder="إلى آية" />
   <input id="note" placeholder="ملاحظة" />
@@ -180,14 +180,14 @@ window.deleteHomework = async function (id) {
 
 window.saveQuran = async function () {
   const qDate = document.getElementById("qDate");
-  const suraInput = document.getElementById("sura");
+  const suraInput = document.getElementById("surah");
   const fromInput = document.getElementById("from");
   const toInput = document.getElementById("to");
   const noteInput = document.getElementById("note");
   const status = document.getElementById("qStatus");
 
   const date = qDate.value;
-  const sura = suraInput.value.trim();
+  const sura = surahInput.value.trim();
   const from = fromInput.value.trim();
   const to = toInput.value.trim();
   const note = noteInput.value.trim();
