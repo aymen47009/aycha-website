@@ -2,115 +2,141 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>📚 دراستي - عائشة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <title>🌟 صفحتي الدراسية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background-color: #fff5fb;
-      color: #4a004a;
+      background-color: #fefafc;
+      margin: 0;
       padding: 20px;
+      color: #4a004a;
     }
+
     h1 {
       text-align: center;
-      font-size: 2.2rem;
-      margin-bottom: 30px;
+      color: #a0007a;
     }
+
     .section {
-      background-color: #ffe6f8;
-      border-radius: 15px;
+      background-color: #fff0fa;
       padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 40px;
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+
+    .section h2 {
+      color: #7a007a;
+    }
+
     label {
-      display: block;
-      margin-top: 10px;
       font-weight: bold;
+      margin-top: 10px;
+      display: block;
     }
+
     input, textarea {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
-      border-radius: 10px;
+      border-radius: 8px;
       border: 1px solid #ddd;
+      font-size: 16px;
     }
+
     button {
       margin-top: 15px;
+      background-color: #e7aaff;
       padding: 10px 20px;
-      background-color: #e0a6ff;
       border: none;
       border-radius: 10px;
       cursor: pointer;
     }
+
     button:hover {
-      background-color: #d183ff;
+      background-color: #d98de5;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 15px;
     }
+
     th, td {
       border: 1px solid #ddd;
       padding: 10px;
       text-align: center;
     }
+
     th {
-      background-color: #ffd9f4;
+      background-color: #fbd6ff;
     }
   </style>
 </head>
 <body>
 
-  <h1>📚 دراستي</h1>
+  <h1>🌟 صفحتي الدراسية - عائشة</h1>
 
-  <!-- 📝 إضافة واجب -->
+  <!-- 📘 القسم 1: جدول الواجبات المدرسية -->
   <div class="section">
-    <h2>✍️ أكتبي واجبك</h2>
-    <label>📘 المادة:</label>
-    <input id="subjectInput" type="text" placeholder="مثال: رياضيات">
+    <h2>📘 واجباتي المدرسية</h2>
+    <label>📚 المادة:</label>
+    <input type="text" id="subject" placeholder="مثال: رياضيات" />
 
-    <label>📄 الصفحة:</label>
-    <input id="pageInput" type="number" placeholder="مثال: 20">
+    <label>📄 رقم الصفحة:</label>
+    <input type="text" id="page" placeholder="مثال: 32" />
 
-    <label>🔢 رقم التمرين:</label>
-    <input id="exerciseInput" type="text" placeholder="مثال: تمرين 3">
+    <label>✏️ رقم التمرين:</label>
+    <input type="text" id="exercise" placeholder="مثال: 3" />
 
-    <label>📆 تاريخ الإنجاز:</label>
-    <input id="dateInput" type="date">
+    <label>📅 تاريخ الإنجاز:</label>
+    <input type="date" id="hwDate" lang="en" style="direction: ltr;" />
 
-    <label>📍 مكان الإنجاز:</label>
-    <input id="placeInput" type="text" placeholder="مثال: في المنزل / المدرسة">
+    <label>🏠 مكان الإنجاز:</label>
+    <input type="text" id="place" placeholder="مثال: في البيت / في المدرسة" />
 
     <button onclick="saveHomework()">💾 حفظ الواجب</button>
-    <p id="saveStatus"></p>
+    <p id="hwStatus"></p>
+    <div id="homeworkList"></div>
   </div>
 
-  <!-- 📋 جدول الواجبات -->
+  <!-- 📖 القسم 2: جدول حفظ القرآن -->
   <div class="section">
-    <h2>📋 جدول واجباتي</h2>
-    <div id="homeworkTable" style="overflow-x: auto;"></div>
+    <h2>📖 جدول حفظ القرآن الكريم</h2>
+    <label>📅 اليوم:</label>
+    <input id="quranDay" placeholder="اختاري اليوم" />
+
+    <label>🕋 السورة:</label>
+    <input type="text" id="quranSurah" />
+
+    <label>من الآية:</label>
+    <input type="text" id="quranFrom" />
+
+    <label>إلى الآية:</label>
+    <input type="text" id="quranTo" />
+
+    <label>ملاحظة:</label>
+    <textarea id="quranNote"></textarea>
+
+    <button onclick="saveQuran()">💾 حفظ الحفظ</button>
+    <p id="quranStatus"></p>
+    <div id="quranList"></div>
   </div>
 
-  <!-- 🎮 اختبار -->
-  <div class="section">
-    <h2>🎮 اختبر نفسك!</h2>
-    <p><strong>س١: ما هو ناتج 7 × 6؟</strong></p>
-    <input type="text" id="q1" placeholder="الإجابة">
-    <p><strong>س٢: ما عاصمة الجزائر؟</strong></p>
-    <input type="text" id="q2" placeholder="الإجابة">
-    <button onclick="checkQuiz()">✅ تحقق من الإجابات</button>
-    <p id="quiz-result" style="color: green;"></p>
-  </div>
+  <!-- Flatpickr -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-  <!-- ✅ Firebase و JavaScript -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
     import {
-      getFirestore, collection, addDoc, Timestamp,
-      getDocs, orderBy, query, deleteDoc, doc
+      getFirestore, collection, addDoc, getDocs,
+      query, orderBy, Timestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
     const firebaseConfig = {
@@ -125,17 +151,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ✅ حفظ الواجب
+    // التقويم للسورة
+    flatpickr("#quranDay", {
+      dateFormat: "Y-m-d",
+      locale: "en"
+    });
+
+    // ✅ كود جدول الواجبات
     window.saveHomework = async function () {
-      const subject = document.getElementById("subjectInput").value.trim();
-      const page = document.getElementById("pageInput").value.trim();
-      const exercise = document.getElementById("exerciseInput").value.trim();
-      const date = document.getElementById("dateInput").value;
-      const place = document.getElementById("placeInput").value.trim();
-      const status = document.getElementById("saveStatus");
+      const subject = document.getElementById("subject").value.trim();
+      const page = document.getElementById("page").value.trim();
+      const exercise = document.getElementById("exercise").value.trim();
+      const date = document.getElementById("hwDate").value;
+      const place = document.getElementById("place").value.trim();
+      const status = document.getElementById("hwStatus");
 
       if (!subject || !page || !exercise || !date || !place) {
-        status.textContent = "❌ الرجاء ملء كل الخانات.";
+        status.textContent = "❌ الرجاء ملء جميع الحقول.";
         status.style.color = "red";
         return;
       }
@@ -146,80 +178,109 @@
         });
         status.textContent = "✔ تم حفظ الواجب!";
         status.style.color = "green";
-
-        document.getElementById("subjectInput").value = "";
-        document.getElementById("pageInput").value = "";
-        document.getElementById("exerciseInput").value = "";
-        document.getElementById("dateInput").value = "";
-        document.getElementById("placeInput").value = "";
-
-        await loadHomeworkTable();
+        showHomework();
       } catch (err) {
         console.error(err);
-        status.textContent = "❌ خطأ أثناء الحفظ.";
+        status.textContent = "❌ خطأ في الحفظ.";
         status.style.color = "red";
       }
-    };
+    }
 
-    // ✅ عرض الواجبات في جدول
-    window.loadHomeworkTable = async function () {
-      const container = document.getElementById("homeworkTable");
+    async function showHomework() {
+      const container = document.getElementById("homeworkList");
       container.innerHTML = "⏳ جاري التحميل...";
+      const q = query(collection(db, "profile", "aycha", "homework"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        container.innerHTML = "📭 لا توجد واجبات بعد.";
+        return;
+      }
+
+      let html = `<table><tr><th>المادة</th><th>الصفحة</th><th>التمرين</th><th>التاريخ</th><th>المكان</th></tr>`;
+      snap.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>${d.subject}</td>
+          <td>${d.page}</td>
+          <td>${d.exercise}</td>
+          <td>${d.date}</td>
+          <td>${d.place}</td>
+        </tr>`;
+      });
+      html += "</table>";
+      container.innerHTML = html;
+    }
+
+    // ✅ كود جدول الحفظ
+    window.saveQuran = async function () {
+      const day = document.getElementById("quranDay").value;
+      const surah = document.getElementById("quranSurah").value.trim();
+      const from = document.getElementById("quranFrom").value.trim();
+      const to = document.getElementById("quranTo").value.trim();
+      const note = document.getElementById("quranNote").value.trim();
+      const status = document.getElementById("quranStatus");
+
+      if (!day || !surah || !from || !to) {
+        status.textContent = "❌ الرجاء ملء جميع الحقول.";
+        status.style.color = "red";
+        return;
+      }
 
       try {
-        const q = query(collection(db, "profile", "aycha", "homework"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-          container.innerHTML = "📭 لا توجد واجبات.";
-          return;
-        }
-
-        let html = `<table><tr>
-          <th>📘 المادة</th><th>📄 الصفحة</th><th>🔢 التمرين</th>
-          <th>📆 التاريخ</th><th>📍 المكان</th><th>🗑️ حذف</th>
-        </tr>`;
-
-        snapshot.forEach(docSnap => {
-          const d = docSnap.data();
-          const id = docSnap.id;
-          html += `<tr>
-            <td>${d.subject}</td>
-            <td>${d.page}</td>
-            <td>${d.exercise}</td>
-            <td>${d.date}</td>
-            <td>${d.place}</td>
-            <td><button onclick="deleteHomework('${id}')">❌</button></td>
-          </tr>`;
+        await addDoc(collection(db, "profile", "aycha", "quran"), {
+          day, surah, from, to, note, createdAt: Timestamp.now()
         });
-
-        html += `</table>`;
-        container.innerHTML = html;
+        status.textContent = "✔ تم حفظ الحفظ!";
+        status.style.color = "green";
+        loadLastSurah();
+        showQuran();
       } catch (err) {
         console.error(err);
-        container.innerHTML = "❌ فشل في تحميل البيانات.";
+        status.textContent = "❌ خطأ في الحفظ.";
+        status.style.color = "red";
       }
-    };
+    }
 
-    // 🗑️ حذف واجب
-    window.deleteHomework = async function (id) {
-      if (confirm("هل تريدين حذف هذا الواجب؟")) {
-        await deleteDoc(doc(db, "profile", "aycha", "homework", id));
-        await loadHomeworkTable();
+    async function loadLastSurah() {
+      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const last = snap.docs[0].data();
+        document.getElementById("quranSurah").value = last.surah;
       }
-    };
+    }
 
-    // 🧠 اختبار ذاتي
-    window.checkQuiz = function () {
-      let score = 0;
-      if (document.getElementById("q1").value.trim() === "42") score++;
-      if (document.getElementById("q2").value.trim() === "الجزائر") score++;
-      document.getElementById("quiz-result").textContent = `🎉 نتيجتك: ${score} من 2`;
-    };
+    async function showQuran() {
+      const container = document.getElementById("quranList");
+      container.innerHTML = "⏳ جاري التحميل...";
+      const q = query(collection(db, "profile", "aycha", "quran"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
 
-    // ✅ تحميل الواجبات عند فتح الصفحة
-    loadHomeworkTable();
+      if (snap.empty) {
+        container.innerHTML = "📭 لا يوجد محفوظات.";
+        return;
+      }
+
+      let html = `<table><tr><th>اليوم</th><th>السورة</th><th>من</th><th>إلى</th><th>ملاحظة</th></tr>`;
+      snap.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>${d.day}</td>
+          <td>${d.surah}</td>
+          <td>${d.from}</td>
+          <td>${d.to}</td>
+          <td>${d.note}</td>
+        </tr>`;
+      });
+      html += `</table>`;
+      container.innerHTML = html;
+    }
+
+    // تحميل البيانات عند فتح الصفحة
+    showHomework();
+    showQuran();
+    loadLastSurah();
   </script>
-
 </body>
 </html>
